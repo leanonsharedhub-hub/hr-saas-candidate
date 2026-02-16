@@ -17,9 +17,12 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && git lfs install
 
+# Copy only requirements first (better layer caching)
+COPY requirements.txt /app/requirements.txt
+
 # Install pip and dependencies
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy the application files
 COPY . /app
