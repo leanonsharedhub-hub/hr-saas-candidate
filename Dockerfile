@@ -24,14 +24,8 @@ RUN pip install --no-cache-dir --upgrade pip \
 # Copy the application files
 COPY . /app
 
-# Install other dependencies like Gradio with specific version for compatibility
-RUN pip install --no-cache-dir gradio==2.9.0 \
-    uvicorn[standard] \
-    websockets>=10.4 \
-    spaces
-
-# Expose the port for the FastAPI server
-EXPOSE 8000
+# Expose the port expected by Hugging Face Spaces
+EXPOSE 7860
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
