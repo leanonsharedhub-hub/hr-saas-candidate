@@ -10,27 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # Full history to ensure correct commit references
 
-      - name: Push Candidate service to Hugging Face Space
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      - name: Set up Git for authentication
         run: |
           git config --global user.email "github-actions@users.noreply.github.com"
           git config --global user.name "github-actions"
-
           git config --global credential.helper store
-          echo "https://user:${HF_TOKEN}@huggingface.co" > ~/.git-credentials
+          echo "https://user:${{ secrets.HF_TOKEN }}@huggingface.co" > ~/.git-credentials
 
+      - name: Prepare the repository
+        run: |
+          # Checkout a clean branch to deploy to Hugging Face
           git checkout --orphan hf-clean
-          git rm -rf . || true
+          git rm -rf . || true   # Remove all files in this branch
 
+          # Checkout the contents from the main branch and prepare for pushing
           git checkout main -- .
           git add .
           git commit -m "Deploy Candidate service to Hugging Face Space"
 
+      - name: Push to Hugging Face Space
+        run: |
           git remote add hf_candidate https://huggingface.co/spaces/LeanonHub/hr-saas-candidate || true
           git push hf_candidate hf-clean:main --force
